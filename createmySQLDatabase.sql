@@ -16,7 +16,7 @@ CREATE TABLE survey_responses(
 
 SET GLOBAL local_infile = 1;
 
-LOAD DATA LOCAL INFILE '/Users/alliewrubel/Desktop/movieratingresponses.csv'
+LOAD DATA LOCAL INFILE 'YOUR FILE PATH HERE'
 INTO TABLE survey_responses
 FIELDS TERMINATED BY ',' OPTIONALLY ENCLOSED BY '"'
 LINES TERMINATED BY '\n'
