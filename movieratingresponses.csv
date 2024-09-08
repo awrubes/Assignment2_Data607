@@ -1,0 +1,6 @@
+timestamp,email,name,gender,age_range,favorite_genres,Beetlejuice_rating,Alien_Romulus_rating,Twisters_rating,Despicable_Me_4_rating,Trap_rating,Deadpool_Wolverine_rating
+9/8/2024 12:29:45,Sarah Johnson,Female,25-34,"Comedy, Drama, Family, Romance",4,,3,5,2,5
+9/8/2024 12:30:41,Alex Martinez,Male,18-24,"Action, Sci-Fi, Thriller",,5,4,2,,5
+9/8/2024 12:31:50,Chris Lee,Nonbinary,35-44,"Documentary, Drama, History, Sci-Fi",3,4,,,3,4
+9/8/2024 12:32:22,John Thompson,Male,45-54,"Adventure, Biography, War, Western",2,3,4,1,,4
+9/8/2024 12:33:03,Emily Davis,Female,55-64,"Drama, Fantasy, Musical, Mystery",5,,,4,3,
