@@ -1,0 +1,87 @@
+---
+title: "Assignment2_AW"
+author: "aw"
+date: "`r Sys.Date()`"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Overview
+
+For this assignment I collected a small portion of data on popular movies. I stored the data in a locally hosted mySQL database and experimented with two different ways of imputing missing data (median and mean) to see how it might impact bias or skew analysis. Below, I will walk you through the data collection method, the database setup, and the r functions used to sort, impute, and compare the two different methods.
+
+## Data Collection
+
+You can access the original survey here: \<<https://forms.gle/LE8KtSGwFtNzi9cp8>\>. Information gathered included general demographic info (age-range, gender, movie_genre interests) as well as each respondents ratings of 6 different movies released in the last year. Respondents had the option of leaving the rating question blank if they hadn't seen the movie.
+
+## Database Setup
+
+Survey answers were compiled in a csv file which you can find here: \<<https://github.com/awrubes/Assignment2_Data607>\> "movieratingresponses.csv". You will need to download the mySQL script "createmySQLDatabase.sql". Make sure to change the file path to match where you are storing your csv file. Once executed, you should have a database called 'Movie Ratings' with three distinct tables: 'movie_ratings', 'respondents' and 'survey_responses'.
+
+## R Setup
+
+In order to access the mySQL database, you will need to install the following packages:
+
+```{r libs, results = "hide"}
+library(DBI)
+library(dplyr)
+library(RMySQL)
+Sys.getenv()
+```
+
+You'll need to provide the user name and password for the root user (or whichever user has proper privileges) and connect to the database.
+
+```{r dbsetup, results = "hide"}
+user_name <- Sys.getenv("MYSQL_USER")
+pass_word <- Sys.getenv("MYSQL_PASS")
+
+conn <- dbConnect(RMySQL::MySQL(), dbname = "Movie Ratings", host = "localhost", user = user_name, password = pass_word)
+
+dbListTables(conn)
+```
+
+## Creating a Dataframe
+
+Since rating and respondent data was stored in two separate tables that reference each other using respondent unique ID's, you'll need to combine the tables.
+
+```{r query}
+query <- "SELECT r.name, r.gender, r.age_range, r.favorite_genres, m.movie_name, m.rating
+          FROM respondents r
+          JOIN movie_ratings m
+          ON r.respondent_id = m.respondent_id;"
+data <- dbGetQuery(conn, query)
+
+head(data, 10)
+```
+
+```{r missing}
+missing_ratings <- sum(is.na(data$rating))
+print(missing_ratings)
+```
+
+There are 9 missing ratings from the data. Next we'll use median and mean to imputation. First, it's important to understand that mean/median imputation is useful when the data is MCAR (missing completely at random), and since a person's decision to see a movie or not is usually not a random one, using this means of imputation may not be the most accurate.
+
+## Imputing Missing Data
+
+```{r calculate}
+data_mean_imputed <- data %>%
+  group_by(movie_name) %>%
+  mutate(rating = ifelse(is.na(rating), mean(rating, na.rm = TRUE), rating))
+
+data_median_imputed <- data %>%
+  group_by(movie_name) %>%
+  mutate(rating = ifelse(is.na(rating), median(rating, na.rm = TRUE), rating))
+
+head(data_mean_imputed)
+head(data_median_imputed)
+
+summary(data_mean_imputed$rating)
+summary(data_median_imputed$rating)
+```
+
+``` r
+dbDisconnect(conn)
+```
